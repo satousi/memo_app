@@ -1,0 +1,1 @@
+{"7":{"title":"xss対策","content":"xss対策\r\ncontent = CGI.escapeHTML(params[:content])\r\n&lt;IMG SRC=&quot;javascript:alert(&#39;XSS&#39;);&quot;&gt;"},"8":{"title":"sinatraでのメモアプリ","content":"RESTは実際行ってみると混乱した\r\n考えているのと実際行うのではかなり差があった😓"}}
