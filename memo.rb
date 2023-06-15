@@ -5,27 +5,29 @@ require 'sinatra/reloader'
 require 'json'
 require 'cgi'
 
-def json_memo_read
-  open('public/memo.json') do |file|
+path = 'public/memo.json'
+
+def read_json_memo(path)
+  File.open(path) do |file|
     JSON.parse(file.read)
   end
 end
 
-def json_memo_write(json_memos)
-  open('public/memo.json', 'w') do |file|
-    JSON.dump(json_memos, file)
+def write_json_memo(path, memos)
+  File.open(path, 'w') do |file|
+    JSON.dump(memos, file)
   end
 end
 
-get '/memos' do
-  json_memos = json_memo_read
+begin
+  memos = read_json_memo(path)
+rescue StandardError
+  memos = { "0": { "title": 'ここはタイトル', "content": 'ここは内容' } }
+  write_json_memo(path, memos)
+end
 
-  @title = ''
-  json_memos.each do |key, memo|
-    @title += '<tr>'
-    @title += "<td><a href=\"/memos/#{key}\">#{memo['title']}</a></td>"
-    @title += "</tr>\n"
-  end
+get '/memos' do
+  @memos = read_json_memo(path)
   erb :top
 end
 
@@ -35,42 +37,40 @@ end
 
 post '/memos/news' do
   memos = {}
-  title = CGI.escapeHTML(params[:title])
-  content = CGI.escapeHTML(params[:content])
+  title = params[:title]
+  content = params[:content]
   memos[title] = content
 
-  json_memos = json_memo_read
+  memos = read_json_memo(path)
 
-  array_memos = json_memos.keys
-  max_number = array_memos.max.to_i
-  json_memos[max_number + 1] = {
+  array_keys = memos.keys
+  max_number = array_keys.max.to_i
+  memos[max_number + 1] = {
     'title' => title,
     'content' => content
   }
 
-  json_memo_write(json_memos)
+  write_json_memo(path, memos)
 
   redirect '/memos'
 end
 
 get '/memos/:key' do
-  json_memos = json_memo_read
+  memos = read_json_memo(path)
 
   @key = params[:key]
-  @title = json_memos[@key]['title']
-  @content = json_memos[@key]['content']
+  @memo = memos[@key]
 
   erb :display
 end
 
 get '/memos/:key/changes' do
-  json_memos = json_memo_read
+  memos = read_json_memo(path)
 
   key = params[:key]
 
   @key = key
-  @title = json_memos[key]['title']
-  @content = json_memos[key]['content']
+  @memo = memos[@key]
 
   erb :change
 end
@@ -80,11 +80,11 @@ patch '/memos/:key/changes' do
   title = params[:title]
   content = params[:content]
 
-  json_memos = json_memo_read
+  memos = read_json_memo(path)
 
-  json_memos[key] = { 'title' => title, 'content' => content }
+  memos[key] = { 'title' => title, 'content' => content }
 
-  json_memo_write(json_memos)
+  write_json_memo(path, memos)
 
   redirect "/memos/#{key}"
 end
@@ -92,11 +92,11 @@ end
 delete '/memos/:key/deletions' do
   key = params[:key]
 
-  json_memos = json_memo_read
+  memos = read_json_memo(path)
 
-  json_memos.delete(key)
+  memos.delete(key)
 
-  json_memo_write(json_memos)
+  write_json_memo(path, memos)
 
   redirect '/memos'
 end

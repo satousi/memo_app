@@ -2,11 +2,11 @@
   <form method="post" action="/memos/<%= @key %>/changes">
     <tr>
       <th>タイトル</th>
-      <td><input type="text" name="title" size="50" value="<%= @title %>"></td>
+      <td><input type="text" name="title" size="50" value="<%= @memo["title"] %>"></td>
     </tr>
     <tr>
       <th>メモ</th>
-      <td><textarea name="content" rows="10" cols="50"><%= @content %></textarea></td>
+      <td><textarea name="content" rows="10" cols="50"><%= @memo["content"] %></textarea></td>
     </tr>
     <tr>
       <td><input type="submit" value="保存"></td>

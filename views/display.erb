@@ -22,11 +22,11 @@
 <table border>
   <tr>
     <th>タイトル</th>
-    <td><input type="text" name="title" size="50" readonly value="<%= @title %>"></td>
+    <td><input type="text" name="title" size="50" readonly value="<%= CGI.escapeHTML(@memo["title"]) %>"></td>
   </tr>
   <tr>
     <th>メモ</th>
-    <td><textarea name="content" rows="10" cols="50" readonly><%= @content %></textarea></td>
+    <td><textarea name="content" rows="10" cols="50" readonly><%= CGI.escapeHTML(@memo["content"]) %></textarea></td>
   </tr>
 
 </table>
