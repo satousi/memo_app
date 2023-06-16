@@ -5,7 +5,7 @@ require 'sinatra/reloader'
 require 'json'
 require 'cgi'
 
-path = 'public/memo.json'
+PATH = 'public/memo.json'
 
 def read_json_memo(path)
   File.open(path) do |file|
@@ -19,15 +19,14 @@ def write_json_memo(path, memos)
   end
 end
 
-begin
-  memos = read_json_memo(path)
-rescue StandardError
-  memos = { "0": { "title": 'ここはタイトル', "content": 'ここは内容' } }
-  write_json_memo(path, memos)
+if File.exist?(PATH)
+  memos = read_json_memo(PATH)
+else
+  write_json_memo(PATH, {})
 end
 
 get '/memos' do
-  @memos = read_json_memo(path)
+  @memos = read_json_memo(PATH)
   erb :top
 end
 
@@ -41,22 +40,20 @@ post '/memos/news' do
   content = params[:content]
   memos[title] = content
 
-  memos = read_json_memo(path)
+  memos = read_json_memo(PATH)
 
-  array_keys = memos.keys
-  max_number = array_keys.max.to_i
-  memos[max_number + 1] = {
+  memos[memos.keys.max.to_i + 1] = {
     'title' => title,
     'content' => content
   }
 
-  write_json_memo(path, memos)
+  write_json_memo(PATH, memos)
 
   redirect '/memos'
 end
 
 get '/memos/:key' do
-  memos = read_json_memo(path)
+  memos = read_json_memo(PATH)
 
   @key = params[:key]
   @memo = memos[@key]
@@ -65,7 +62,7 @@ get '/memos/:key' do
 end
 
 get '/memos/:key/changes' do
-  memos = read_json_memo(path)
+  memos = read_json_memo(PATH)
 
   key = params[:key]
 
@@ -80,11 +77,11 @@ patch '/memos/:key/changes' do
   title = params[:title]
   content = params[:content]
 
-  memos = read_json_memo(path)
+  memos = read_json_memo(PATH)
 
   memos[key] = { 'title' => title, 'content' => content }
 
-  write_json_memo(path, memos)
+  write_json_memo(PATH, memos)
 
   redirect "/memos/#{key}"
 end
@@ -92,11 +89,11 @@ end
 delete '/memos/:key/deletions' do
   key = params[:key]
 
-  memos = read_json_memo(path)
+  memos = read_json_memo(PATH)
 
   memos.delete(key)
 
-  write_json_memo(path, memos)
+  write_json_memo(PATH, memos)
 
   redirect '/memos'
 end

@@ -23,6 +23,9 @@ GEM
     builder (3.2.4)
     concurrent-ruby (1.2.2)
     crass (1.0.6)
+    debug (1.7.1)
+      irb (>= 1.5.0)
+      reline (>= 0.3.1)
     erb_lint (0.4.0)
       activesupport
       better_html (>= 2.0.1)
@@ -33,6 +36,9 @@ GEM
     erubi (1.12.0)
     i18n (1.13.0)
       concurrent-ruby (~> 1.0)
+    io-console (0.6.0)
+    irb (1.6.2)
+      reline (>= 0.3.0)
     json (2.6.3)
     loofah (2.21.3)
       crass (~> 1.0.2)
@@ -58,6 +64,8 @@ GEM
       nokogiri (~> 1.14)
     rainbow (3.1.1)
     regexp_parser (2.7.0)
+    reline (0.3.2)
+      io-console (~> 0.5)
     rexml (3.2.5)
     rubocop (1.51.0)
       json (~> 2.3)
@@ -101,6 +109,7 @@ PLATFORMS
   arm64-darwin-22
 
 DEPENDENCIES
+  debug
   erb_lint
   rubocop
   rubocop-fjord
