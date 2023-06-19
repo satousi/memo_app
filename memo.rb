@@ -8,8 +8,12 @@ require 'cgi'
 PATH = 'public/memo.json'
 
 def read_json_memo(path)
-  File.open(path) do |file|
-    JSON.parse(file.read)
+  if File.exist?(path)
+    File.open(path) do |file|
+      JSON.parse(file.read)
+    end
+  else
+    write_json_memo(path, {})
   end
 end
 
@@ -17,12 +21,6 @@ def write_json_memo(path, memos)
   File.open(path, 'w') do |file|
     JSON.dump(memos, file)
   end
-end
-
-if File.exist?(PATH)
-  memos = read_json_memo(PATH)
-else
-  write_json_memo(PATH, {})
 end
 
 get '/memos' do
@@ -35,10 +33,8 @@ get '/memos/news' do
 end
 
 post '/memos/news' do
-  memos = {}
   title = params[:title]
   content = params[:content]
-  memos[title] = content
 
   memos = read_json_memo(PATH)
 
@@ -72,7 +68,7 @@ get '/memos/:key/changes' do
   erb :change
 end
 
-patch '/memos/:key/changes' do
+patch '/memos/:key' do
   key = params[:key]
   title = params[:title]
   content = params[:content]
@@ -86,7 +82,7 @@ patch '/memos/:key/changes' do
   redirect "/memos/#{key}"
 end
 
-delete '/memos/:key/deletions' do
+delete '/memos/:key' do
   key = params[:key]
 
   memos = read_json_memo(PATH)
