@@ -2,29 +2,23 @@
 
 require 'sinatra'
 require 'sinatra/reloader'
-require 'json'
+require 'pg'
 require 'cgi'
+require 'dotenv'
+Dotenv.load
 
-PATH = 'public/memo.json'
-
-def read_json_memo(path)
-  if File.exist?(path)
-    File.open(path) do |file|
-      JSON.parse(file.read)
-    end
-  else
-    write_json_memo(path, {})
-  end
-end
-
-def write_json_memo(path, memos)
-  File.open(path, 'w') do |file|
-    JSON.dump(memos, file)
-  end
+before do
+  @conn = PG::Connection.new(
+    host: 'ik1-201-74253.vs.sakura.ne.jp',
+    dbname: 'mydb',
+    user: 'satousi',
+    password: ENV['password'],
+    port: 5432
+  )
 end
 
 get '/memos' do
-  @memos = read_json_memo(PATH)
+  @memos = @conn.exec('SELECT * FROM memos')
   erb :top
 end
 
@@ -36,60 +30,41 @@ post '/memos/news' do
   title = params[:title]
   content = params[:content]
 
-  memos = read_json_memo(PATH)
-
-  memos[memos.keys.max.to_i + 1] = {
-    'title' => title,
-    'content' => content
-  }
-
-  write_json_memo(PATH, memos)
+  @conn.exec_params('INSERT INTO memos (title, content) VALUES ($1, $2)', [title, content])
 
   redirect '/memos'
 end
 
-get '/memos/:key' do
-  memos = read_json_memo(PATH)
+get '/memos/:id' do
+  @id = params[:id]
 
-  @key = params[:key]
-  @memo = memos[@key]
+  @memos = @conn.exec_params('SELECT * FROM memos WHERE id = $1', [@id])
 
   erb :display
 end
 
-get '/memos/:key/changes' do
-  memos = read_json_memo(PATH)
+get '/memos/:id/changes' do
+  @id = params[:id]
 
-  key = params[:key]
-
-  @key = key
-  @memo = memos[@key]
+  @memos = @conn.exec_params('SELECT * FROM memos WHERE id = $1', [@id])
 
   erb :change
 end
 
-patch '/memos/:key' do
-  key = params[:key]
+patch '/memos/:id' do
+  id = params[:id]
   title = params[:title]
   content = params[:content]
 
-  memos = read_json_memo(PATH)
+  @conn.exec_params('UPDATE memos SET title = $1, content = $2 WHERE id = $3', [title, content, id])
 
-  memos[key] = { 'title' => title, 'content' => content }
-
-  write_json_memo(PATH, memos)
-
-  redirect "/memos/#{key}"
+  redirect "/memos/#{id}"
 end
 
-delete '/memos/:key' do
-  key = params[:key]
+delete '/memos/:id' do
+  id = params[:id]
 
-  memos = read_json_memo(PATH)
-
-  memos.delete(key)
-
-  write_json_memo(PATH, memos)
+  @conn.exec_params('DELETE FROM memos WHERE id = $1', [id])
 
   redirect '/memos'
 end
