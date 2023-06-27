@@ -20,14 +20,12 @@
 </table>
 
 <table border>
-  <% @memos.each do |memo| %>
   <tr>
     <th>タイトル</th>
-    <td><input type="text" name="title" size="50" readonly value="<%= CGI.escapeHTML(memo["title"]) %>"></td>
+    <td><input type="text" name="title" size="50" readonly value="<%= CGI.escapeHTML(@memos[0]["title"]) %>"></td>
   </tr>
   <tr>
     <th>メモ</th>
-    <td><textarea name="content" rows="10" cols="50" readonly><%= CGI.escapeHTML(memo['content']) %></textarea></td>
+    <td><textarea name="content" rows="10" cols="50" readonly><%= CGI.escapeHTML(@memos[0]['content']) %></textarea></td>
   </tr>
-  <% end %>
 </table>

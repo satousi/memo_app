@@ -9,7 +9,7 @@ Dotenv.load
 
 before do
   @conn = PG::Connection.new(
-    host: 'ik1-201-74253.vs.sakura.ne.jp',
+    host: ENV['host'],
     dbname: 'mydb',
     user: 'satousi',
     password: ENV['password'],
