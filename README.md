@@ -1,8 +1,9 @@
 ## memo_app
 - sinatraで動くメモアプリ
 - ローカル上で使用
-- DBを使用しません
 ## インストール
+- PostgreSQLのインストール:公式ウェブサイト（https://www.postgresql.org/download）
+- PostgreSQLの初期設定はddlを参照
 - git clone https://github.com/satousi/memo_app.git
 - ディレクトリに移動
   - cd memo_app
